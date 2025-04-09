@@ -1,6 +1,5 @@
 // example2.dart : text 입력 폼
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // 1. 시작점
@@ -8,7 +7,7 @@ void main(){
   runApp( MyApp() );
 }
 // 2-1. 상태 있는 앱 화면 선언
-class MyApp extends StatefulBuilder{
+class MyApp extends StatefulWidget{
   // 상태를 사용할 위젯명 설정
   MyAppState createState() => MyAppState();
 }
