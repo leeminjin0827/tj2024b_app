@@ -1,9 +1,7 @@
 // detail.dart : 상세 화면 파일
 
 // 상태 있는 위젯
-
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Detail extends StatefulWidget{
@@ -47,7 +45,23 @@ class _DetailState extends State<Detail>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar( title : Text("상세 화면"),),
-      body: Center( child: Text("본문"),),
+      body: Center(
+        child: Column(
+          children: [
+            Text("제목: ${todo['title']}" , style: TextStyle( fontSize: 25),),
+            SizedBox( height: 8 ,), // 여백
+            
+            Text("내용: ${todo['content']}" , style: TextStyle( fontSize: 20),),
+            SizedBox( height: 8,), // 여백
+            
+            Text("완료 여부 : ${todo['done'] == 'true' ? '완료' : '미완료' }" , style: TextStyle( fontSize: 15),),
+            SizedBox( height: 8,), // 여백
+            
+            Text("할일 등록일 : ${todo['createAt']}" , style: TextStyle( fontSize: 15),),
+            SizedBox( height: 8,), // 여백
+          ],
+        )
+      ),
     ); // scaffold end
   } // override end
 

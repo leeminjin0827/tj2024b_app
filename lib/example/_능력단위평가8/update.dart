@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Update extends StatefulWidget{
@@ -14,34 +13,23 @@ class _UpdateState extends State<Update>{
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments;
-
-    if (args != null) {
-      try {
-        int bno = int.parse(args.toString());
-        print("넘어온 bno: $bno");
-        bookFindById(bno);
-      } catch (e) {
-        print("에러: arguments는 있지만 int로 변환 불가 - $e");
-      }
-    } else {
-      print("에러: arguments가 null임");
-    }
-  }
+    int bno = ModalRoute.of(context)!.settings.arguments as int;
+    print(bno);
+    bookFindById(bno);
+  } // f end
   
   // 서버 통신
   Dio dio = Dio();
   Map<String , dynamic> book = {};
   void bookFindById( int bno ) async{
     try{
-      final response = await dio.get("http://192.168.40.88:8080/tast8/book/view?bno=$bno");
+      final response = await dio.get("http://192.168.40.88:8080/test8/book/view?bno=$bno");
       final data = response.data;
       setState(() {
         book = data;
         titleController.text = data['btitle'];
         nameController.text = data['bname'];
         contentController.text = data['bcontent'];
-        done = data['done'];
       });
     }catch(e) { print( e ); }
   }
@@ -50,8 +38,26 @@ class _UpdateState extends State<Update>{
   TextEditingController titleController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController contentController = TextEditingController();
-  bool done = true;
-  // 입력 컨트롤러
+  TextEditingController passwordController = TextEditingController();
+
+  void bookUpdate() async {
+    try{
+      final sendData = {
+        "bno" : book['bno'],
+        "btitle" : titleController.text,
+        "bname" : nameController.text,
+        "bcontent" : contentController.text,
+        "bpassword" : passwordController.text,
+      };
+      print(sendData);
+      final response = await dio.put("http://192.168.40.88:8080/test8/book" , data: sendData );
+      // print("response.data : " + response.data);
+      final data = response.data;
+      if( data != null ){
+        Navigator.pushNamed(context, "/" );
+      }
+    }catch(e){ print(e); }
+  }
 
   // ===============================================================================================
   @override
@@ -79,13 +85,13 @@ class _UpdateState extends State<Update>{
               maxLines: 2,
             ),
             SizedBox( height: 20),
-            Text("완료 여부"),
-            Switch(
-                value: done,
-                onChanged: (value)=>{ setState(() { done = value; }) },
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration( labelText: "비밀번호"),
+              maxLines: 2,
             ),
             SizedBox( height: 20),
-            OutlinedButton(onPressed: ()=>{}, child: Text("수정하기"))
+            OutlinedButton(onPressed: bookUpdate , child: Text("수정하기"))
           ],
         ),
       ),

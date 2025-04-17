@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class Detail extends StatefulWidget{
   @override
@@ -9,6 +10,8 @@ class Detail extends StatefulWidget{
 class _DetailState extends State<Detail>{
   @override
   Widget build(BuildContext context) {
-    return Text("상세조회");
+    return Scaffold(
+        appBar: AppBar( title: Text("상세 화면"),),
+    );
   }
 } // c end
