@@ -51,7 +51,6 @@ class _UpdateState extends State<Update>{
       };
       print(sendData);
       final response = await dio.put("http://192.168.40.88:8080/test8/book" , data: sendData );
-      // print("response.data : " + response.data);
       final data = response.data;
       if( data != null ){
         Navigator.pushNamed(context, "/" );
