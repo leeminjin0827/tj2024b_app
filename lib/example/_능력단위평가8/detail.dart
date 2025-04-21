@@ -47,7 +47,7 @@ class _DetailState extends State<Detail>{
       final response = await dio.post("http://192.168.40.88:8080/test8/review" , data: sendData );
       final data = response.data;
       if( data != null ) {
-        bookFindBno(bno!); // 새로고침
+        reviewView(bno!); // 새로고침
         rcontentController.clear(); // 칸 비우기
         rpasswordController.clear();
       }
@@ -67,13 +67,93 @@ class _DetailState extends State<Detail>{
   } // reviewView end
 
   // 리뷰 삭제
-  void reviewDelete( int bno , String rpassword ) async{
+  void reviewDelete( int rno , String rpassword ) async{
     try{
-      final response = await dio.delete("http://192.168.40.88:8080/test8/review?bno=$bno&rpassword=$rpassword");
+      final response = await dio.delete("http://192.168.40.88:8080/test8/review?rno=$rno&rpassword=$rpassword");
       final data = response.data;
-      if( data == true ){ bookFindBno(bno!); }
+      print( data );
+      if( data == true ){
+        showCreate("삭제 성공");
+        reviewView(bno!); 
+      }else{
+        showError("비밀번호가 일치하지 않습니다.");
+      }
     }catch(e){ print(e); }
   } // 리뷰 삭제 end
+
+  // 비밀번호 입력 창
+  void showDelete( int rno ){
+    TextEditingController passwordController = TextEditingController();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("비밀번호 확인"),
+            content: TextField(
+              controller: passwordController,
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(hintText: "비밀번호 입력"),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // 닫기
+                },
+                child: Text("취소"),
+              ),
+              TextButton(
+                onPressed: () {
+                  int? rpassword = int.tryParse(passwordController.text);
+                  if( rpassword != null ){
+                    Navigator.of(context).pop(); // 다이얼로그 닫기
+                    reviewDelete(rno, rpassword.toString()); // 삭제 실행
+                  }else{
+                  }
+                },
+                child: Text("삭제"),
+              )
+            ],
+          );
+        }
+    );
+  } // 비밀번호 입력 창 end
+
+  // 삭제 성공 알림창
+  void showCreate( String message) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("삭제"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              child: Text("확인"),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        )
+    );
+  } // 삭제 성공 알림 창 end
+
+  // 비밀번호 틀렸을 때 창
+  void showError( String message ) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("오류"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              child: Text("확인"),
+              onPressed: ()=>Navigator.of(context).pop(),
+
+            )
+          ],
+        )
+    );
+  } // 비밀번호 틀렸을 때 창 end
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +202,7 @@ class _DetailState extends State<Detail>{
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            OutlinedButton(onPressed: () => reviewDelete(review['bno'],review['rpassword']), child: Text("삭제"))
+                            OutlinedButton(onPressed: ()=>{showDelete( review['rno'] ) }, child: Text("삭제"))
                           ],
                         ),
                       );
