@@ -67,7 +67,7 @@ class _DetailState extends State<Detail>{
   } // reviewView end
 
   // 리뷰 삭제
-  void reviewDelete( int bno  ) async{
+  void reviewDelete( int bno , String rpassword ) async{
     try{
       final response = await dio.delete("http://192.168.40.88:8080/test8/review?bno=$bno&rpassword=$rpassword");
       final data = response.data;
@@ -122,7 +122,7 @@ class _DetailState extends State<Detail>{
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            OutlinedButton(onPressed: () => reviewDelete(review['bno']), child: Text("삭제"))
+                            OutlinedButton(onPressed: () => reviewDelete(review['bno'],review['rpassword']), child: Text("삭제"))
                           ],
                         ),
                       );

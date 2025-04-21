@@ -26,7 +26,7 @@ class _SignupState extends State<Signup>{
     Dio dio = Dio();
     try {
       final response = await dio.post(
-          "http://localhost:8080/member/post", data: sendData);
+          "http://localhost:8080/member/signup", data: sendData);
       final data = response.data;
       if (data == true) {
         print("회원가입 성공");
