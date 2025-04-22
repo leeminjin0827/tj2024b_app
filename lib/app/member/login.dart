@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tj2024b_app/app/layout/mainapp.dart';
 
 class Login extends StatefulWidget{
   @override
@@ -28,6 +29,12 @@ class _LoginState extends State<Login>{
         final prefs = await SharedPreferences.getInstance();
         // 2. 전역변수 값 추가
         await prefs.setString( 'token' , data );
+
+        // * 로그인 성공시 페이지 전환
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainApp() ),
+        );
       }else{
         print("로그인 실패");
       }
