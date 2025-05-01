@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tj2024b_app/app/member/signup.dart';
 import 'package:tj2024b_app/app/product/productView.dart';
 
 class ProductList extends StatefulWidget{

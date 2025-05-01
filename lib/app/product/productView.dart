@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductView extends StatefulWidget{ // [부모위젯]
 
@@ -28,7 +29,8 @@ class _ProductViewState extends State<ProductView>{ // [자식위젯]
   // 1.
   Map<String , dynamic> product = {}; // 제품 1개를 저장하는 상태변수.
   final dio = Dio();
-  final baseUrl = "http://192.168.40.88:8080"; // 환경에 따라 변경
+  final String baseUrl = "http://192.168.40.88:8080"; // 환경에 따라 변경
+  bool isOwner = false; // 현재 로그인된 회원이 등록한 제품인지 확인 변수
 
   // 2. 생명주기
   @override // (1) pno에 해당 하는 제품 정보 요청
@@ -40,11 +42,35 @@ class _ProductViewState extends State<ProductView>{ // [자식위젯]
       final response = await dio.get("$baseUrl/product/view?pno=${ widget.pno }");
       if( response.data != null ){
         setState(() {
-          product = response.data; print( product ); // print 확인시 -> 웹:F12개발자도구 , 에뮬레이터 : 콘솔 
+          product = response.data; print( product ); // print 확인시 -> 웹:F12개발자도구 , 에뮬레이터 : 콘솔
         });
-      }
+        // * 현재 로그인된 회원
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString("token");
+        if( token == null ){ setState(() { isOwner = false; }); return; } // 비로그인중이면 리턴
+        // * 토큰 보내서 토큰의 회원정보 요청
+        dio.options.headers['Authorization'] = token; // token 포함
+        final response2 = await dio.get("${baseUrl}/member/info"); // 요청
+        if( response2.data['memail'] == response.data['memail'] ){ // 회원정보의 아이디 와 제품의 등록회원아이디와 같으면
+          setState(() { isOwner == true; }); // 현재 로그인된 회원이 내가 등록한제품을 본다.
+        } // if end
+      } // if end
     }catch(e) { print( e ); }
   } // onView end
+
+  // 5. 삭제 요청 함수 , pno : 삭제할 제품번호
+  void onDelete( pno ) async {
+    try{
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("token");
+      if( token == null ) { return; }
+      dio.options.headers['Authorization'] = token;
+      final response = await dio.delete("${baseUrl}/product/delete?pno=${pno}");
+      if( response.data == true ){
+        print("삭제성공");
+      } // if end
+    }catch(e){ print( e ); }
+  } // onDelete end
 
   // 4. 화면 반환
   @override
@@ -114,10 +140,17 @@ class _ProductViewState extends State<ProductView>{ // [자식위젯]
             Text("제품 설명" , style: TextStyle( fontSize: 20 , fontWeight: FontWeight.bold ),),
             SizedBox( height: 8,),
             Text( product['pcontent'] ),
+            /* 만약에 isOwner 가 true 이면 로그인된 회원의 제품  */
+            if( isOwner )
+              Row(
+                children: [
+                  ElevatedButton(onPressed: () => {} , child: Text("수정")),
+                  ElevatedButton(onPressed: () => { onDelete( product['pno'] ) } , child: Text("삭제")),
+                ],
+              )
           ],
         ),
       ), 
-        
     );
   } // build end
 } // c end
